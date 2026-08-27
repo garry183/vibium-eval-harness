@@ -1,0 +1,78 @@
+name: agent-pipeline
+
+# Not wired to any trigger you haven't chosen yet -- workflow_dispatch only,
+# so cloning this repo can never accidentally spend your API budget via a
+# push/PR trigger. Flip to `pull_request`/`push` once you're comfortable
+# with the cost per run (each explorer/writer/runner call is a real Claude
+# API call).
+on:
+  workflow_dispatch:
+    inputs:
+      page:
+        description: "Page name to run the pipeline for"
+        required: true
+        default: "login"
+
+jobs:
+  explore-and-gate:
+    runs-on: ubuntu-latest
+    outputs:
+      gate_passed: ${{ steps.grade.outputs.gate_passed }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - run: playwright install --with-deps chromium
+      - name: Explore
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python -m agents.explorer.explorer_agent --page "${{ inputs.page }}"
+      - name: Grade (explore mode) -- gates the writer
+        id: grade
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: |
+          python -m agents.grader.grader_agent --mode explore --target "${{ inputs.page }}" | tee grade.json || true
+          PASSED=$(python -c "import json;print(str(json.load(open('grade.json')).get('gate_passed')).lower())")
+          echo "gate_passed=$PASSED" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: explorer-output-${{ inputs.page }}
+          path: output/explorer/${{ inputs.page }}
+          retention-days: 7
+
+  write-run-grade:
+    needs: explore-and-gate
+    if: needs.explore-and-gate.outputs.gate_passed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .
+      - run: playwright install --with-deps chromium
+      - uses: actions/download-artifact@v4
+        with:
+          name: explorer-output-${{ inputs.page }}
+          path: output/explorer/${{ inputs.page }}
+      - name: Write tests
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python -m agents.writer.writer_agent --page "${{ inputs.page }}"
+      - name: Run + fix
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python -m agents.runner.runner_agent --page "${{ inputs.page }}"
+      - name: Grade (writer mode)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: python -m agents.grader.grader_agent --mode writer --target "${{ inputs.page }}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: generated-suite-${{ inputs.page }}
+          path: tests
+          retention-days: 7

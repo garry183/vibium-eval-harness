@@ -1,0 +1,47 @@
+{
+  "version": "1.0",
+  "schema": "explore-golden-v1",
+  "project": "vibe-check",
+  "description": "Declarative pass/fail expectations the explore-grader checks the explorer's output against. Purely natural-language assertions -- no code -- same shape as the production pattern this repo is inspired by.",
+  "last_updated": "2026-08-26",
+  "cases": [
+    {
+      "id": "EXP-001",
+      "name": "login",
+      "url": "/",
+      "description": "Sauce Demo login page -- the simplest possible case, good smoke test for the whole pipeline.",
+      "expectations": [
+        {"id": "EXP-001-01", "text": "A username input field is identified with a semantic primary locator (placeholder or label), not CSS/XPath", "category": "locator_quality", "severity": "HIGH"},
+        {"id": "EXP-001-02", "text": "A password input field is identified with a semantic primary locator", "category": "locator_quality", "severity": "HIGH"},
+        {"id": "EXP-001-03", "text": "A login submit button is identified by role=button and accessible name/text", "category": "locator_quality", "severity": "HIGH"},
+        {"id": "EXP-001-04", "text": "None of the three core elements (username, password, login button) have count > 1 for their primary strategy", "category": "ambiguity", "severity": "HIGH"},
+        {"id": "EXP-001-05", "text": "The accessibility tree was captured and referenced as the basis for at least one element's accessibility_node", "category": "ground_truth", "severity": "MEDIUM"}
+      ]
+    },
+    {
+      "id": "EXP-002",
+      "name": "inventory",
+      "url": "/inventory.html",
+      "description": "Product listing page reached after login -- tests whether the explorer can navigate through an auth step and enumerate a repeated component (product cards).",
+      "expectations": [
+        {"id": "EXP-002-01", "text": "At least one 'Add to cart' button is identified with role=button and a semantic locator", "category": "locator_quality", "severity": "HIGH"},
+        {"id": "EXP-002-02", "text": "The explorer notes that multiple 'Add to cart' buttons exist (one per product) and flags this repetition rather than treating it as a single ambiguous locator error", "category": "dynamic_content", "severity": "HIGH"},
+        {"id": "EXP-002-03", "text": "A sort/filter control for the product list is identified", "category": "coverage", "severity": "MEDIUM"},
+        {"id": "EXP-002-04", "text": "The shopping cart icon/link in the header is identified with a semantic locator", "category": "locator_quality", "severity": "MEDIUM"},
+        {"id": "EXP-002-05", "text": "context.md explains how per-product buttons are distinguished from each other (e.g. by nearby product name) if flagged as a testability gap", "category": "context_narrative", "severity": "MEDIUM"}
+      ]
+    },
+    {
+      "id": "EXP-003",
+      "name": "cart",
+      "url": "/cart.html",
+      "description": "Cart page reached after adding an item -- tests precondition-state navigation (login -> add to cart -> view cart) in one crawl.",
+      "expectations": [
+        {"id": "EXP-003-01", "text": "A 'Checkout' button is identified with a semantic primary locator", "category": "locator_quality", "severity": "HIGH"},
+        {"id": "EXP-003-02", "text": "A 'Remove' button for the cart item is identified with a semantic primary locator", "category": "locator_quality", "severity": "HIGH"},
+        {"id": "EXP-003-03", "text": "A 'Continue Shopping' button is identified", "category": "coverage", "severity": "LOW"},
+        {"id": "EXP-003-04", "text": "The element map correctly reflects that this page required prior navigation state (not directly reachable from a fresh session) if the explorer attempted a cold visit", "category": "dynamic_content", "severity": "MEDIUM"}
+      ]
+    }
+  ]
+}

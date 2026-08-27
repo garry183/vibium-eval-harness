@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["agents*"]
+
+[project]
+name = "vibe-check"
+version = "0.1.0"
+description = "AI agent pipeline (explorer -> grader -> writer -> runner -> grader) that vibe-checks a live site with Vibium and hands off to a deterministic Playwright suite."
+requires-python = ">=3.10"
+dependencies = [
+    "claude-agent-sdk>=0.2.144",
+    "vibium>=26.8.21",
+    "playwright>=1.55",
+    "pytest>=8.0",
+    "pytest-playwright>=0.9",
+    "pytest-json-report>=1.5",
+    "python-dotenv>=1.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/specs"]

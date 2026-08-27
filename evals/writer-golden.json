@@ -1,0 +1,24 @@
+{
+  "version": "1.0",
+  "schema": "writer-golden-v1",
+  "project": "vibe-check",
+  "description": "Declarative pass/fail expectations the writer-grader checks generated test files against. Checks the actual files, never the plan that produced them.",
+  "last_updated": "2026-08-26",
+  "cases": [
+    {
+      "id": "WRT-001",
+      "name": "login",
+      "description": "4-layer suite generated for the login page.",
+      "expectations": [
+        {"id": "WRT-001-01", "text": "All 4 layers exist: pages/login_page.py, modules/login_module.py, fixtures/login_fixtures.py, specs/test_login.py", "category": "structure", "severity": "HIGH"},
+        {"id": "WRT-001-02", "text": "login_page.py contains only locator properties -- no assertions and no direct navigation/click calls", "category": "layering", "severity": "HIGH"},
+        {"id": "WRT-001-03", "text": "test_login.py is the only file containing assertions (expect(...) calls)", "category": "layering", "severity": "HIGH"},
+        {"id": "WRT-001-04", "text": "No hardcoded URL string appears in any of the 4 files -- TARGET_BASE_URL is imported from agents.shared.config instead", "category": "config_hygiene", "severity": "HIGH"},
+        {"id": "WRT-001-05", "text": "No time.sleep() call appears anywhere in the 4 files", "category": "waiting", "severity": "HIGH"},
+        {"id": "WRT-001-06", "text": "Locators used in login_page.py match the `primary` strategy type recorded in element-map.json for the username, password, and login button elements (e.g. get_by_placeholder/get_by_role, not a raw CSS selector)", "category": "locator_fidelity", "severity": "HIGH"},
+        {"id": "WRT-001-07", "text": "test-cases/login.testcases.md exists and its bullets correspond to actual test function names present in test_login.py, not to hypothetical/planned tests", "category": "traceability", "severity": "MEDIUM"},
+        {"id": "WRT-001-08", "text": "No TODO, FIXME, or placeholder/stub function bodies (e.g. `pass` where real logic is expected) appear in any of the 4 files", "category": "completeness", "severity": "HIGH"}
+      ]
+    }
+  ]
+}

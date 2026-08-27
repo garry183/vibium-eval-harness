@@ -1,0 +1,49 @@
+{
+  "mode": "writer",
+  "target": "login",
+  "pass_rate": 1.0,
+  "critical_failures": [],
+  "results": [
+    {
+      "expectation_id": "WRT-001-01",
+      "passed": true,
+      "evidence": "All 4 layers present: tests/pages/login_page.py, tests/modules/login_module.py, tests/fixtures/login_fixtures.py, tests/specs/test_login.py"
+    },
+    {
+      "expectation_id": "WRT-001-02",
+      "passed": true,
+      "evidence": "login_page.py contains only @property methods returning locators; no expect() calls or action methods"
+    },
+    {
+      "expectation_id": "WRT-001-03",
+      "passed": true,
+      "evidence": "Only test_login.py contains expect() calls; login_page.py, login_module.py, login_fixtures.py have zero assertions"
+    },
+    {
+      "expectation_id": "WRT-001-04",
+      "passed": true,
+      "evidence": "TARGET_BASE_URL imported from agents.shared.config in login_module.py and test_login.py; no hardcoded URL strings present"
+    },
+    {
+      "expectation_id": "WRT-001-05",
+      "passed": true,
+      "evidence": "No time.sleep() calls found in any of the 4 files"
+    },
+    {
+      "expectation_id": "WRT-001-06",
+      "passed": true,
+      "evidence": "get_by_placeholder() for username/password, get_by_role() for headings; CSS fallback [data-test='login-button'] documented as element-map testability_gap workaround"
+    },
+    {
+      "expectation_id": "WRT-001-07",
+      "passed": true,
+      "evidence": "login.testcases.md exists with bullets matching all 4 test functions: test_login_form_elements_are_visible, test_credentials_hint_panel_displays_expected_headings, test_successful_login_navigates_away_from_login_page, test_invalid_login_stays_on_login_page"
+    },
+    {
+      "expectation_id": "WRT-001-08",
+      "passed": true,
+      "evidence": "No TODO/FIXME markers found; all functions have complete implementations with populated test bodies"
+    }
+  ],
+  "gate_passed": true
+}
