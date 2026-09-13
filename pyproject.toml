@@ -18,7 +18,11 @@ dependencies = [
     "pytest-playwright>=0.9",
     "pytest-json-report>=1.5",
     "python-dotenv>=1.0",
+    "jsonschema>=4.20",
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["tests/specs"]
+testpaths = ["tests/unit", "tests/specs"]
+markers = [
+    "live: hits a real browser and/or the live target site -- costs time, run explicitly with `-m live`",
+]

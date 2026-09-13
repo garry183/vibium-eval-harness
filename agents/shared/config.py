@@ -25,24 +25,35 @@ OUTPUT_DIR = ROOT / "output" / "explorer"
 EVALS_DIR = ROOT / "evals"
 TESTS_DIR = ROOT / "tests"
 
-# Model choice per agent role. Explorer/writer/runner need real reasoning over
-# ambiguous live-page state; grader is closer to deterministic rubric-checking,
-# so it defaults to a cheaper tier. Override any of these via env if needed.
+# Model choice per agent role. A judge must be at least as capable as what it
+# judges -- a cheaper-tier grader scoring Sonnet output is a capability
+# inversion, not a cost optimization (self-grading-bias research says
+# same-family judges are fine; a *weaker* judge is the actual risk). Override
+# any of these via env if needed.
 MODELS = {
     "explorer": os.environ.get("VIBE_CHECK_MODEL_EXPLORER", "claude-sonnet-5"),
     "writer": os.environ.get("VIBE_CHECK_MODEL_WRITER", "claude-sonnet-5"),
     "runner": os.environ.get("VIBE_CHECK_MODEL_RUNNER", "claude-sonnet-5"),
-    "grader": os.environ.get("VIBE_CHECK_MODEL_GRADER", "claude-haiku-4-5-20251001"),
+    "grader": os.environ.get("VIBE_CHECK_MODEL_GRADER", "claude-sonnet-5"),
 }
 
 EXPLORE_GRADE_GATE = "B"  # writer refuses to run below this band
+
+# Out of 35 (7 LLM-judged dimensions x 5), not 40 -- schema_compliance was
+# removed from the LLM rubric and is now a deterministic jsonschema check
+# (see agents/shared/schemas.py) run as a hard gate instead of a judged score.
+# Bands keep the same percentage cutoffs as the original 0-40 scale.
 EXPLORE_GRADE_BANDS = {
-    "A": (37, 40),
-    "B": (30, 36),
-    "C": (21, 29),
-    "D": (12, 20),
-    "F": (0, 11),
+    "A": (32, 35),
+    "B": (26, 31),
+    "C": (18, 25),
+    "D": (11, 17),
+    "F": (0, 10),
 }
+
+
+def band_for_score(score: int) -> str:
+    return next((b for b, (lo, hi) in EXPLORE_GRADE_BANDS.items() if lo <= score <= hi), "F")
 
 
 def explorer_output_dir(page: str) -> Path:

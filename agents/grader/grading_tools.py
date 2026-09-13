@@ -13,7 +13,9 @@ from claude_agent_sdk import create_sdk_mcp_server, tool
 _captured: dict[str, Any] = {}
 
 EXPLORE_DIMENSIONS = [
-    "schema_compliance",
+    # schema_compliance deliberately excluded: it's a pure structural check,
+    # now enforced deterministically by agents.shared.schemas.validate_explorer_output
+    # before the LLM ever sees the output. See schemas.py module docstring.
     "semantic_primary_rate",
     "coverage_completeness",
     "strategy_validation",

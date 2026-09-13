@@ -8,3 +8,4 @@ test-results/
 node_modules/
 *.egg-info/
 .claude/
+traces/

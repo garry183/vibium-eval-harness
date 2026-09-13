@@ -12,15 +12,18 @@ from pathlib import Path
 from claude_agent_sdk import ClaudeAgentOptions, query
 
 from agents.grader.grading_tools import EXPLORE_DIMENSIONS, grading_server, take_captured
-from agents.shared.config import EVALS_DIR, EXPLORE_GRADE_BANDS, MODELS, OUTPUT_DIR, TESTS_DIR
+from agents.grader.run_log import record_run
+from agents.grader.static_checks import check_writer_files
+from agents.shared.config import EVALS_DIR, MODELS, OUTPUT_DIR, TESTS_DIR, band_for_score
+from agents.shared.schemas import validate_explorer_output
 
 EXPLORE_SYSTEM_PROMPT = """You are the explore-grader. You score an \
 explorer agent's output against a fixed rubric so a writer agent downstream \
 can trust it without re-verifying the live page itself.
 
-Score each of these 8 dimensions 0-5 based on the element-map.json and \
-context.md you're given:
-- schema_compliance: does element-map.json match the required shape exactly?
+element-map.json's structural shape has already been validated separately --
+do not re-check schema compliance. Score each of these 7 dimensions 0-5 \
+based on the element-map.json and context.md you're given:
 - semantic_primary_rate: what fraction of elements have a semantic (not css/xpath) primary?
 - coverage_completeness: does the map cover the elements a page like this should have?
 - strategy_validation: are strategy counts/confidence scores plausible given the evidence shown?
@@ -43,15 +46,17 @@ WRITER_SYSTEM_PROMPT = """You are the writer-grader. You score generated \
 test files against a golden list of expectations -- fail fast on evidence \
 of low-quality or stub output.
 
-Look for: TODO/stub markers, hardcoded URLs (anything not routed through \
-config), non-semantic locators used where a semantic one was available in \
-the element map, missing one of the 4 required layers (page object, \
-module, fixture, spec), and time.sleep() calls (forbidden -- explicit waits \
-only).
+TODO/stub markers, hardcoded URLs, missing layers, and time.sleep() calls \
+have already been checked deterministically -- don't re-check those. Focus \
+on what actually needs judgment: non-semantic locators used where a \
+semantic one was available in the element map, and whether the golden \
+expectations are genuinely satisfied by the file contents (not just \
+superficially present).
 
 Check each golden expectation against the actual file contents you're \
-given and record pass/fail with a one-line evidence quote. List any of the \
-issues above as critical_failures even if no expectation directly names them.
+given and record pass/fail with a one-line evidence quote. List any \
+judgment-based issue you find as a critical_failure even if no expectation \
+directly names it.
 
 Call submit_writer_grade exactly once, at the end, with your full verdict. \
 Do not call it more than once, and do not explain your reasoning in text \
@@ -72,6 +77,8 @@ async def grade_explore(page: str) -> dict:
     element_map = (out_dir / "element-map.json").read_text()
     context_md = (out_dir / "context.md").read_text()
 
+    schema_errors = validate_explorer_output(json.loads(element_map))
+
     prompt = (
         f"Golden case:\n{json.dumps(case, indent=2)}\n\n"
         f"element-map.json:\n{element_map}\n\n"
@@ -91,8 +98,9 @@ async def grade_explore(page: str) -> dict:
 
     verdict = take_captured("explore")
     score = sum(verdict["dimensions"][d] for d in EXPLORE_DIMENSIONS)
-    band = next((b for b, (lo, hi) in EXPLORE_GRADE_BANDS.items() if lo <= score <= hi), "F")
-    gate_passed = band in ("A", "B") and not verdict["critical_failures"]
+    band = band_for_score(score)
+    all_critical = [*schema_errors, *verdict["critical_failures"]]
+    gate_passed = band in ("A", "B") and not all_critical
 
     result = {
         "mode": "explore",
@@ -100,11 +108,12 @@ async def grade_explore(page: str) -> dict:
         "score": score,
         "band": band,
         "dimensions": verdict["dimensions"],
-        "critical_failures": verdict["critical_failures"],
+        "critical_failures": all_critical,
         "results": verdict["expectation_results"],
         "gate_passed": gate_passed,
     }
     (out_dir / "explore-grading.json").write_text(json.dumps(result, indent=2))
+    record_run("explore", result)
     return result
 
 
@@ -115,6 +124,12 @@ async def grade_writer(suite: str) -> dict:
     fixture_files = sorted((TESTS_DIR / "fixtures").glob(f"*{suite}*.py"))
     spec_files = sorted((TESTS_DIR / "specs").glob(f"test_{suite}*.py"))
     catalogue_files = sorted((TESTS_DIR / "test-cases").glob(f"{suite}.testcases.md"))
+    layer_files = {
+        "page": page_files, "module": module_files, "fixture": fixture_files,
+        "spec": spec_files, "catalogue": catalogue_files,
+    }
+    static_failures = check_writer_files(suite, layer_files)
+
     all_files = [*page_files, *module_files, *fixture_files, *spec_files, *catalogue_files]
     file_dump = "\n\n".join(
         f"--- {f.relative_to(TESTS_DIR.parent)} ---\n{f.read_text()}" for f in all_files
@@ -137,17 +152,19 @@ async def grade_writer(suite: str) -> dict:
     total = len(verdict["expectation_results"])
     passed = sum(1 for r in verdict["expectation_results"] if r["passed"])
     pass_rate = passed / total if total else 0.0
-    gate_passed = pass_rate == 1.0 and not verdict["critical_failures"]
+    all_critical = [*static_failures, *verdict["critical_failures"]]
+    gate_passed = pass_rate == 1.0 and not all_critical
 
     result = {
         "mode": "writer",
         "target": suite,
         "pass_rate": pass_rate,
-        "critical_failures": verdict["critical_failures"],
+        "critical_failures": all_critical,
         "results": verdict["expectation_results"],
         "gate_passed": gate_passed,
     }
     (TESTS_DIR / "test-cases" / f"{suite}-grading.json").write_text(json.dumps(result, indent=2))
+    record_run("writer", result)
     return result
 
 
