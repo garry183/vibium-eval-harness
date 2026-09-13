@@ -1,0 +1,48 @@
+{
+  "page": "login",
+  "url": "https://www.saucedemo.com/",
+  "viewport": "unknown",
+  "crawled_at": "2026-09-07T00:00:00Z",
+  "stats": {"total": 3, "with_primary": 3, "gaps": 0},
+  "elements": [
+    {
+      "name": "usernameInput",
+      "role": "textbox",
+      "strategies": [
+        {"type": "placeholder", "selector": "placeholder=Username", "count": 1, "confidence": 5, "note": null},
+        {"type": "label", "selector": "label=Username", "count": 0, "confidence": 1, "note": "Timed out / no match. Accessible name is 'Username' (derived from placeholder) but vibium's label locator does not resolve it -- likely targets <label>/aria-label only, not placeholder-derived names. Use placeholder as primary."}
+      ],
+      "primary": {"type": "placeholder", "selector": "placeholder=Username", "count": 1, "confidence": 5, "note": null},
+      "or_chain": "placeholder=Username",
+      "accessibility_node": {"role": "textbox", "name": "Username"},
+      "testability_gap": false,
+      "gap_note": null
+    },
+    {
+      "name": "passwordInput",
+      "role": "textbox",
+      "strategies": [
+        {"type": "placeholder", "selector": "placeholder=Password", "count": 1, "confidence": 5, "note": null},
+        {"type": "label", "selector": "label=Password", "count": 0, "confidence": 1, "note": "Same as usernameInput: label locator fails despite matching accessible name in a11y tree. Use placeholder as primary."}
+      ],
+      "primary": {"type": "placeholder", "selector": "placeholder=Password", "count": 1, "confidence": 5, "note": null},
+      "or_chain": "placeholder=Password",
+      "accessibility_node": {"role": "textbox", "name": "Password"},
+      "testability_gap": false,
+      "gap_note": null
+    },
+    {
+      "name": "loginButton",
+      "role": "button",
+      "strategies": [
+        {"type": "label", "selector": "role=button,label=Login", "count": 1, "confidence": 5, "note": "Element is <input type=submit value='Login'>. Accessible name 'Login' comes from the value attribute; the generic 'text' locator does NOT match it (matches innerText/textContent only, not value), but 'label' locator correctly resolves the computed accessible name."},
+        {"type": "text", "selector": "role=button,text=Login", "count": 0, "confidence": 1, "note": "Fails -- text locator does not read the value attribute of input[type=submit]. Do not use text= for this element."}
+      ],
+      "primary": {"type": "label", "selector": "role=button,label=Login", "count": 1, "confidence": 5, "note": null},
+      "or_chain": "role=button,label=Login",
+      "accessibility_node": {"role": "button", "name": "Login"},
+      "testability_gap": false,
+      "gap_note": null
+    }
+  ]
+}

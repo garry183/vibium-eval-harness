@@ -1,0 +1,48 @@
+{
+  "page": "login",
+  "url": "https://www.saucedemo.com/",
+  "viewport": "1280x720",
+  "crawled_at": "2026-09-07T00:00:00Z",
+  "stats": {"total": 3, "with_primary": 3, "gaps": 1},
+  "elements": [
+    {
+      "name": "usernameInput",
+      "role": "textbox",
+      "strategies": [
+        {"type": "placeholder", "selector": "placeholder=Username", "count": 1, "confidence": 5, "note": null},
+        {"type": "role", "selector": "role=textbox", "count": 2, "confidence": 1, "note": "Ambiguous: matches both username and password fields."}
+      ],
+      "primary": {"type": "placeholder", "selector": "placeholder=Username", "count": 1, "confidence": 5, "note": null},
+      "or_chain": "placeholder=Username (no reliable fallback needed; accessible name also 'Username' but no <label> element exists so label= locator fails)",
+      "accessibility_node": {"role": "textbox", "name": "Username"},
+      "testability_gap": false,
+      "gap_note": null
+    },
+    {
+      "name": "passwordInput",
+      "role": "textbox",
+      "strategies": [
+        {"type": "placeholder", "selector": "placeholder=Password", "count": 1, "confidence": 5, "note": null},
+        {"type": "role", "selector": "role=textbox", "count": 2, "confidence": 1, "note": "Ambiguous: matches both username and password fields."}
+      ],
+      "primary": {"type": "placeholder", "selector": "placeholder=Password", "count": 1, "confidence": 5, "note": null},
+      "or_chain": "placeholder=Password (label= locator fails, no associated <label> element)",
+      "accessibility_node": {"role": "textbox", "name": "Password"},
+      "testability_gap": false,
+      "gap_note": null
+    },
+    {
+      "name": "loginButton",
+      "role": "button",
+      "strategies": [
+        {"type": "label", "selector": "label=Login", "count": 1, "confidence": 4, "note": "Element is an <input type=submit value=Login>; 'label' query matches on the value attribute acting as accessible name, not a <label> tag."},
+        {"type": "role", "selector": "role=button", "count": 1, "confidence": 5, "note": "Only one button on the page, so role alone is unambiguous today -- but brittle if more buttons are added later."}
+      ],
+      "primary": {"type": "role", "selector": "role=button,text=Login", "count": 1, "confidence": 5, "note": "Recommend pairing role with accessible name 'Login' in Playwright (getByRole('button', { name: 'Login' })) for resilience even though role alone currently resolves to 1."},
+      "or_chain": "role=button[name=Login] -> label=Login -> role=button",
+      "accessibility_node": {"role": "button", "name": "Login"},
+      "testability_gap": true,
+      "gap_note": "MEDIUM: data-test attribute (data-test='login-button') is present on the real DOM per known SauceDemo markup, but vibium's testid locator strategy only checks data-testid and returned 0 matches for testid=login-button. Same applies to data-test='username' and data-test='password' on the inputs (testid=username / testid=password both timed out). Downstream tests should NOT rely on getByTestId() here; use role/placeholder locators instead, or a documented CSS fallback like [data-test='login-button'] if the framework supports custom testid attribute config."
+    }
+  ]
+}

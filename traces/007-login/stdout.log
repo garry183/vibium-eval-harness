@@ -1,0 +1,22 @@
+[explorer] exploring https://www.saucedemo.com/ -> D:\Frameworks\vibium\output\explorer\login
+[explorer] tool: mcp__vibium__vibium_navigate({"url": "https://www.saucedemo.com/"})
+[explorer] tool: mcp__vibium__vibium_get_a11y_tree({})
+[explorer] tool: mcp__vibium__vibium_find({"placeholder": "Username"})
+[explorer] tool: mcp__vibium__vibium_find({"placeholder": "Password"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "button"})
+[explorer] tool: mcp__vibium__vibium_find({"testid": "login-button"})
+[explorer] tool: mcp__vibium__vibium_find({"text": "Login"})
+[explorer] tool: mcp__vibium__vibium_find({"testid": "username"})
+[explorer] tool: mcp__vibium__vibium_find({"label": "Username"})
+[explorer] tool: mcp__vibium__vibium_find({"label": "Password"})
+[explorer] tool: mcp__vibium__vibium_find({"label": "Login"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "button", "text": "Login"})
+[explorer] tool: mcp__vibium__vibium_screenshot({"output_dir": "D:\\Frameworks\\vibium\\output\\explorer\\login", "name": "login-page"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "heading"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "link"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "img"})
+[explorer] No links or images. Only 3 interactive elements: username input, password input, login button.
+[explorer] tool: Write({"file_path": "D:\\Frameworks\\vibium\\output\\explorer\\login\\element-map.json", "content": "{\n  \"page\": \"login\",)
+[explorer] tool: Write({"file_path": "D:\\Frameworks\\vibium\\output\\explorer\\login\\context.md", "content": "# Login page (saucedemo.com)\n\)
+[explorer] 3 interactive elements found: username/password inputs (placeholder-based, unambiguous) and login button (role=button, only reliable because it's the sole button). Files written to `D:\Frameworks\vibium\output\explorer\login\`. One MEDIUM gap flagged: login button lacks a stable testid.
+[explorer] done: D:\Frameworks\vibium\output\explorer\login\element-map.json

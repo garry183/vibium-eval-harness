@@ -1,0 +1,55 @@
+{
+  "page": "login",
+  "url": "https://www.saucedemo.com/",
+  "viewport": "1280x720",
+  "crawled_at": "2026-09-07T00:00:00Z",
+  "stats": {"total": 3, "with_primary": 3, "gaps": 1},
+  "elements": [
+    {
+      "name": "usernameInput",
+      "role": "textbox",
+      "strategies": [
+        {"type": "placeholder", "selector": "placeholder=Username", "count": 1, "confidence": 5, "note": null},
+        {"type": "role", "selector": "role=textbox", "count": 2, "confidence": 1, "note": "Ambiguous alone: matches both username and password fields."},
+        {"type": "label", "selector": "label=Username", "count": 0, "confidence": 1, "note": "Timed out / no match, despite a11y tree reporting accessible name 'Username'. Name is likely derived from placeholder, not an associated <label>; vibium's label strategy does not resolve it. Do not use as primary."},
+        {"type": "css", "selector": "[data-test='username']", "count": null, "confidence": 4, "note": "Documented fallback only, not verified via vibium_find (testid strategy failed to resolve data-test attribute -- see gap note). Based on known SauceDemo markup convention."}
+      ],
+      "primary": {"type": "placeholder", "selector": "placeholder=Username", "count": 1, "confidence": 5, "note": null},
+      "or_chain": "placeholder=Username -> css=[data-test='username'] (documented fallback, unverified)",
+      "accessibility_node": {"role": "textbox", "name": "Username"},
+      "testability_gap": false,
+      "gap_note": null
+    },
+    {
+      "name": "passwordInput",
+      "role": "textbox",
+      "strategies": [
+        {"type": "placeholder", "selector": "placeholder=Password", "count": 1, "confidence": 5, "note": null},
+        {"type": "role", "selector": "role=textbox", "count": 2, "confidence": 1, "note": "Ambiguous alone: matches both username and password fields."},
+        {"type": "label", "selector": "label=Password", "count": 0, "confidence": 1, "note": "Timed out / no match, same root cause as usernameInput's label strategy."},
+        {"type": "css", "selector": "[data-test='password']", "count": null, "confidence": 4, "note": "Documented fallback only, not verified via vibium_find. Based on known SauceDemo markup convention."}
+      ],
+      "primary": {"type": "placeholder", "selector": "placeholder=Password", "count": 1, "confidence": 5, "note": null},
+      "or_chain": "placeholder=Password -> css=[data-test='password'] (documented fallback, unverified)",
+      "accessibility_node": {"role": "textbox", "name": "Password"},
+      "testability_gap": false,
+      "gap_note": null
+    },
+    {
+      "name": "loginButton",
+      "role": "button",
+      "strategies": [
+        {"type": "role", "selector": "role=button,label=Login", "count": 1, "confidence": 5, "note": "Accessible name 'Login' resolves via role+label combo even though visible text/innerText is empty (it's an <input type=submit value=Login>, so 'text' content is empty but the value attribute supplies the accessible name)."},
+        {"type": "role", "selector": "role=button", "count": 1, "confidence": 4, "note": "Only one button on the page currently, so unqualified role query is unambiguous today, but fragile if more buttons are added later. Prefer the label-qualified strategy."},
+        {"type": "text", "selector": "text=Login", "count": 0, "confidence": 1, "note": "Failed -- element has no text node (value attribute isn't matched by text query)."},
+        {"type": "testid", "selector": "testid=login-button", "count": 0, "confidence": 1, "note": "Failed -- vibium's testid strategy expects data-testid; SauceDemo uses data-test instead."},
+        {"type": "css", "selector": "[data-test='login-button']", "count": null, "confidence": 4, "note": "Documented fallback only, not verified via vibium_find."}
+      ],
+      "primary": {"type": "role", "selector": "role=button,label=Login", "count": 1, "confidence": 5, "note": null},
+      "or_chain": "role=button,label=Login -> css=[data-test='login-button'] (documented fallback, unverified)",
+      "accessibility_node": {"role": "button", "name": ""},
+      "testability_gap": true,
+      "gap_note": "vibium_find's 'text' and raw a11y tree both report an empty accessible name/text for this button, yet role+label=Login does resolve it uniquely. The writer agent should use the role+label combo, not a bare text query, and should be aware the underlying element is an <input type=submit>, not a <button>."
+    }
+  ]
+}

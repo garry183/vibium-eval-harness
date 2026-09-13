@@ -1,0 +1,52 @@
+{
+  "page": "login",
+  "url": "https://www.saucedemo.com/",
+  "viewport": "1280x720",
+  "crawled_at": "2026-09-07T00:00:00Z",
+  "stats": {"total": 3, "with_primary": 3, "gaps": 0},
+  "elements": [
+    {
+      "name": "usernameInput",
+      "role": "textbox",
+      "strategies": [
+        {"type": "placeholder", "selector": "placeholder=Username", "count": 1, "confidence": 5, "note": null},
+        {"type": "label", "selector": "role=textbox,label=Username", "count": 0, "confidence": 1, "note": "Timed out / no match. Accessible name is derived from placeholder, not aria-label, so label= query fails."},
+        {"type": "css", "selector": "[data-test=\"username\"]", "count": null, "confidence": 3, "note": "Not verified via vibium (testid strategy targets data-testid, this site uses data-test). Documented fallback only, unverified count."}
+      ],
+      "primary": {"type": "placeholder", "selector": "placeholder=Username", "count": 1, "confidence": 5, "note": null},
+      "or_chain": "placeholder=Username || css=[data-test=\"username\"]",
+      "accessibility_node": {"role": "textbox", "name": "Username"},
+      "testability_gap": false,
+      "gap_note": null
+    },
+    {
+      "name": "passwordInput",
+      "role": "textbox",
+      "strategies": [
+        {"type": "placeholder", "selector": "placeholder=Password", "count": 1, "confidence": 5, "note": null},
+        {"type": "label", "selector": "role=textbox,label=Password", "count": 0, "confidence": 1, "note": "Timed out / no match, same cause as usernameInput."},
+        {"type": "css", "selector": "[data-test=\"password\"]", "count": null, "confidence": 3, "note": "Not verified via vibium (data-test vs data-testid mismatch). Documented fallback only."}
+      ],
+      "primary": {"type": "placeholder", "selector": "placeholder=Password", "count": 1, "confidence": 5, "note": null},
+      "or_chain": "placeholder=Password || css=[data-test=\"password\"]",
+      "accessibility_node": {"role": "textbox", "name": "Password"},
+      "testability_gap": false,
+      "gap_note": null
+    },
+    {
+      "name": "loginButton",
+      "role": "button",
+      "strategies": [
+        {"type": "label", "selector": "role=button,label=Login", "count": 1, "confidence": 5, "note": "Element is an <input type=submit value='Login'>; text= strategy fails because it checks textContent/innerText (empty for inputs), but label= resolves the accessible name correctly."},
+        {"type": "role", "selector": "role=button", "count": 1, "confidence": 4, "note": "Only one button on page currently; confidence lower than label because it would break if more buttons are added."},
+        {"type": "text", "selector": "text=Login", "count": 0, "confidence": 1, "note": "Fails -- input value attribute is not matched by text/innerText-based queries."},
+        {"type": "css", "selector": "[data-test=\"login-button\"]", "count": null, "confidence": 3, "note": "Not verified via vibium (data-test vs data-testid mismatch). Documented fallback only."}
+      ],
+      "primary": {"type": "label", "selector": "role=button,label=Login", "count": 1, "confidence": 5, "note": null},
+      "or_chain": "role=button,label=Login || css=[data-test=\"login-button\"]",
+      "accessibility_node": {"role": "button", "name": "Login"},
+      "testability_gap": false,
+      "gap_note": null
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "run_id": "004-login",
+  "index": 4,
+  "page": "login",
+  "url": "https://www.saucedemo.com/",
+  "model": "claude-sonnet-5",
+  "exit_code": 0,
+  "duration_s": 304.7,
+  "artifacts": [
+    "element-map.json",
+    "context.md"
+  ],
+  "stale_artifacts_ignored": [],
+  "produced_element_map": true,
+  "started_at": "2026-09-07T08:04:41+00:00"
+}

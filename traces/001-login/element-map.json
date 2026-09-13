@@ -1,0 +1,54 @@
+{
+  "page": "login",
+  "url": "https://www.saucedemo.com/",
+  "viewport": "1280x720",
+  "crawled_at": "2026-09-07T00:00:00Z",
+  "stats": {"total": 3, "with_primary": 3, "gaps": 1},
+  "elements": [
+    {
+      "name": "usernameInput",
+      "role": "textbox",
+      "strategies": [
+        {"type": "placeholder", "selector": "placeholder=Username", "count": 1, "confidence": 5, "note": null},
+        {"type": "role", "selector": "role=textbox", "count": 2, "confidence": 1, "note": "Ambiguous: matches both username and password textboxes; do not use alone."},
+        {"type": "testid", "selector": "testid=username", "count": 0, "confidence": 1, "note": "No match. Site uses a `data-test` attribute, not `data-testid`; vibium's testid query does not target it."},
+        {"type": "css", "selector": "[data-test=\"username\"]", "count": null, "confidence": 4, "note": "Untested via vibium_find (CSS not queryable through this tool's semantic finder), but visible in DOM as documented fallback per known SauceDemo markup."}
+      ],
+      "primary": {"type": "placeholder", "selector": "placeholder=Username", "count": 1, "confidence": 5, "note": null},
+      "or_chain": "placeholder=Username OR css=[data-test=\"username\"]",
+      "accessibility_node": {"role": "textbox", "name": "Username"},
+      "testability_gap": false,
+      "gap_note": null
+    },
+    {
+      "name": "passwordInput",
+      "role": "textbox",
+      "strategies": [
+        {"type": "placeholder", "selector": "placeholder=Password", "count": 1, "confidence": 5, "note": null},
+        {"type": "role", "selector": "role=textbox", "count": 2, "confidence": 1, "note": "Ambiguous: matches both username and password textboxes; do not use alone."},
+        {"type": "testid", "selector": "testid=password", "count": 0, "confidence": 1, "note": "No match, same data-test vs data-testid mismatch as username field."},
+        {"type": "css", "selector": "[data-test=\"password\"]", "count": null, "confidence": 4, "note": "Documented fallback, not directly verifiable through vibium_find's semantic-only interface."}
+      ],
+      "primary": {"type": "placeholder", "selector": "placeholder=Password", "count": 1, "confidence": 5, "note": null},
+      "or_chain": "placeholder=Password OR css=[data-test=\"password\"]",
+      "accessibility_node": {"role": "textbox", "name": "Password"},
+      "testability_gap": false,
+      "gap_note": null
+    },
+    {
+      "name": "loginButton",
+      "role": "button",
+      "strategies": [
+        {"type": "role", "selector": "role=button", "count": 1, "confidence": 4, "note": "Only one button on the page, so role alone is currently unambiguous, but this will break the moment a second button is added to this page."},
+        {"type": "text", "selector": "text=Login", "count": 0, "confidence": 1, "note": "No match. Element is an <input type=submit value=Login>; Playwright's text engine matches rendered text nodes, not the value attribute, so text locators fail here."},
+        {"type": "testid", "selector": "testid=login-button", "count": 0, "confidence": 1, "note": "No match, same data-test vs data-testid mismatch."},
+        {"type": "css", "selector": "[data-test=\"login-button\"]", "count": null, "confidence": 4, "note": "Documented fallback based on known SauceDemo markup; not directly verifiable through vibium_find."}
+      ],
+      "primary": {"type": "role", "selector": "role=button", "count": 1, "confidence": 4, "note": "Unambiguous today only because it's the sole button on the page."},
+      "or_chain": "role=button OR css=[data-test=\"login-button\"]",
+      "accessibility_node": {"role": "button", "name": null},
+      "testability_gap": true,
+      "gap_note": "Accessibility tree reports no accessible name for the Login button (input[type=submit] value should map to an accessible name but wasn't surfaced). Text-based locators fail entirely because Playwright's text matcher doesn't read the value attribute. role=button is only safe while this is the single button on the page -- flag for the writer agent to add a name-based assertion or use the CSS data-test fallback for resilience."
+    }
+  ]
+}

@@ -8,4 +8,8 @@ test-results/
 node_modules/
 *.egg-info/
 .claude/
+# Explorer run traces. Ignored because a looped explorer generates these
+# without bound -- but the 8 login runs are force-added: DEFECT-LOG.md's
+# counts are unverifiable without them, and Unit 7 needs them as the
+# pre-change baseline. Re-add any new evidence trace with `git add -f`.
 traces/

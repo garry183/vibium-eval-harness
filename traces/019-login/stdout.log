@@ -1,0 +1,32 @@
+[explorer] exploring https://www.saucedemo.com/ -> D:\Frameworks\vibium\output\explorer\login
+[explorer] tool: mcp__vibium__vibium_navigate({"url": "https://www.saucedemo.com/"})
+[explorer] tool: mcp__vibium__vibium_get_a11y_tree({})
+[explorer] tool: mcp__vibium__vibium_find({"role": "textbox", "label": "Username"})
+[explorer] tool: mcp__vibium__vibium_find({"placeholder": "Username"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "textbox", "label": "Password"})
+[explorer] tool: mcp__vibium__vibium_find({"placeholder": "Password"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "button"})
+[explorer] tool: mcp__vibium__vibium_find({"text": "Login"})
+[explorer] tool: mcp__vibium__vibium_find({"testid": "username"})
+[explorer] tool: mcp__vibium__vibium_find({"testid": "password"})
+[explorer] tool: mcp__vibium__vibium_find({"testid": "login-button"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "button", "label": "Login"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "img"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "heading"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "heading", "text": "Accepted usernames are:"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "heading", "text": "Password for all users:"})
+[explorer] tool: mcp__vibium__vibium_find({"text": "standard_user"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "link"})
+[explorer] tool: mcp__vibium__vibium_screenshot({"output_dir": "D:\\Frameworks\\vibium\\output\\explorer\\login", "name": "login-page"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "textbox"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "textbox", "placeholder": "Username"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "textbox", "placeholder": "Password"})
+[explorer] Confirmed: role=textbox alone is ambiguous (2 matches); placeholder disambiguates each field uniquely. Now writing the artifacts.
+[explorer] tool: Write({"file_path": "D:\\Frameworks\\vibium\\output\\explorer\\login\\element-map.json", "content": "{\n  \"page\": \"login\",)
+[explorer] tool: Write({"file_path": "D:\\Frameworks\\vibium\\output\\explorer\\login\\context.md", "content": "# Login page (saucedemo.com)\n\)
+[explorer] Done. 3 interactive elements mapped (username/password inputs, login button), all with verified primary locators via `placeholder=` and `role+label` combos. One HIGH gap flagged: the login control is an `<input type=submit>` with an empty text node — a naive `text=Login` locator fails; must use `role=button,label=Login`. Also noted `testid` doesn't resolve here (site uses `data-test`, not `data-testid`) and `label=` queries don't catch placeholder-derived accessible names.
+
+Files written:
+- `D:\Frameworks\vibium\output\explorer\login\element-map.json`
+- `D:\Frameworks\vibium\output\explorer\login\context.md`
+[explorer] done: D:\Frameworks\vibium\output\explorer\login\element-map.json

@@ -1,0 +1,52 @@
+{
+  "page": "login",
+  "url": "https://www.saucedemo.com/",
+  "viewport": "1280x720",
+  "crawled_at": "2026-09-07T00:00:00Z",
+  "stats": {"total": 3, "with_primary": 3, "gaps": 0},
+  "elements": [
+    {
+      "name": "usernameInput",
+      "role": "textbox",
+      "strategies": [
+        {"type": "placeholder", "selector": "placeholder=Username", "count": 1, "confidence": 5, "note": null},
+        {"type": "role", "selector": "role=textbox", "count": 2, "confidence": 2, "note": "Ambiguous alone - matches both username and password fields"},
+        {"type": "testid", "selector": "testid=username", "count": 0, "confidence": 1, "note": "No element found - app does not expose a data-testid attribute (uses data-test convention not queryable by this tool's testid strategy)"}
+      ],
+      "primary": {"type": "placeholder", "selector": "placeholder=Username", "count": 1, "confidence": 5, "note": null},
+      "or_chain": "placeholder=Username (preferred) -> role=textbox scoped/nth as last resort",
+      "accessibility_node": {"role": "textbox", "name": "Username"},
+      "testability_gap": false,
+      "gap_note": null
+    },
+    {
+      "name": "passwordInput",
+      "role": "textbox",
+      "strategies": [
+        {"type": "placeholder", "selector": "placeholder=Password", "count": 1, "confidence": 5, "note": null},
+        {"type": "role", "selector": "role=textbox", "count": 2, "confidence": 2, "note": "Ambiguous alone - matches both username and password fields"},
+        {"type": "testid", "selector": "testid=password", "count": 0, "confidence": 1, "note": "No element found - no data-testid attribute exposed"}
+      ],
+      "primary": {"type": "placeholder", "selector": "placeholder=Password", "count": 1, "confidence": 5, "note": null},
+      "or_chain": "placeholder=Password (preferred) -> role=textbox scoped/nth as last resort",
+      "accessibility_node": {"role": "textbox", "name": "Password"},
+      "testability_gap": false,
+      "gap_note": null
+    },
+    {
+      "name": "loginButton",
+      "role": "button",
+      "strategies": [
+        {"type": "label", "selector": "label=Login", "count": 1, "confidence": 5, "note": "Accessible name 'Login' comes from the input's value attribute, not a text node - visible text content reads as empty string when queried via text/role dump"},
+        {"type": "role", "selector": "role=button", "count": 1, "confidence": 5, "note": "Currently unambiguous (only button on page); would need the label qualifier if more buttons are added"},
+        {"type": "text", "selector": "text=Login", "count": 0, "confidence": 1, "note": "No match - element is an <input type=submit>, so there is no text node for a pure text-content match; use label= instead"},
+        {"type": "testid", "selector": "testid=login-button", "count": 0, "confidence": 1, "note": "No element found - no data-testid attribute exposed"}
+      ],
+      "primary": {"type": "label", "selector": "label=Login", "count": 1, "confidence": 5, "note": "Accessible-name based, most robust against future markup/DOM changes"},
+      "or_chain": "label=Login (preferred) -> role=button as fallback while it remains the sole button",
+      "accessibility_node": {"role": "button", "name": "Login"},
+      "testability_gap": false,
+      "gap_note": null
+    }
+  ]
+}

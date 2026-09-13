@@ -1,0 +1,48 @@
+{
+  "page": "login",
+  "url": "https://www.saucedemo.com/",
+  "viewport": "unknown",
+  "crawled_at": "2026-09-07T00:00:00Z",
+  "stats": {"total": 3, "with_primary": 3, "gaps": 1},
+  "elements": [
+    {
+      "name": "usernameInput",
+      "role": "textbox",
+      "strategies": [
+        {"type": "placeholder", "selector": "placeholder=Username", "count": 1, "confidence": 5, "note": null},
+        {"type": "label", "selector": "label=Username", "count": 0, "confidence": 1, "note": "getByLabel-style query found no match; accessible name comes from placeholder, not an associated <label>/aria-label. Do not use label strategy for this element."}
+      ],
+      "primary": {"type": "placeholder", "selector": "placeholder=Username", "count": 1, "confidence": 5, "note": null},
+      "or_chain": "placeholder=Username",
+      "accessibility_node": {"role": "textbox", "name": "Username"},
+      "testability_gap": false,
+      "gap_note": null
+    },
+    {
+      "name": "passwordInput",
+      "role": "textbox",
+      "strategies": [
+        {"type": "placeholder", "selector": "placeholder=Password", "count": 1, "confidence": 5, "note": null},
+        {"type": "label", "selector": "label=Password", "count": 0, "confidence": 1, "note": "getByLabel-style query found no match; accessible name comes from placeholder, not an associated <label>/aria-label. Do not use label strategy for this element."}
+      ],
+      "primary": {"type": "placeholder", "selector": "placeholder=Password", "count": 1, "confidence": 5, "note": null},
+      "or_chain": "placeholder=Password",
+      "accessibility_node": {"role": "textbox", "name": "Password"},
+      "testability_gap": false,
+      "gap_note": null
+    },
+    {
+      "name": "loginButton",
+      "role": "button",
+      "strategies": [
+        {"type": "role", "selector": "role=button", "count": 1, "confidence": 5, "note": "Only one button on page, so bare role=button is unambiguous, but this is fragile if a second button (e.g. an error-dialog close button) is ever added to this page."},
+        {"type": "label", "selector": "label=Login", "count": 1, "confidence": 4, "note": "Matches via accessible name (rendered from the input's value/aria-label attribute). Visible text is uppercase 'LOGIN' via CSS text-transform, but accessible name is 'Login' -- accessible name differs from rendered visible text in casing."}
+      ],
+      "primary": {"type": "role", "selector": "role=button", "count": 1, "confidence": 4, "note": "Combining role=button with text=Login fails (0 matches) because the element's textContent is empty -- the label comes from value/aria-label, not innerText. Prefer role=button alone, or label=Login as a fallback; never combine role+text=Login for this element."},
+      "or_chain": "role=button (fallback: label=Login)",
+      "accessibility_node": {"role": "button", "name": "Login"},
+      "testability_gap": true,
+      "gap_note": "MEDIUM: role=button is only unambiguous because it is the sole button on the page today. The element has no reliable data-testid (guessed testid=login-button and testid=username both returned 0 matches, so no data-testid/data-test-id attribute is exposed to the testid locator). Combining role+text fails because accessible name != textContent. Recommend the dev team add a stable data-testid to the login button so tests don't silently break if a second button is introduced."
+    }
+  ]
+}

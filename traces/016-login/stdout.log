@@ -1,0 +1,31 @@
+[explorer] exploring https://www.saucedemo.com/ -> D:\Frameworks\vibium\output\explorer\login
+[explorer] tool: mcp__vibium__vibium_navigate({"url": "https://www.saucedemo.com/"})
+[explorer] tool: mcp__vibium__vibium_get_a11y_tree({})
+[explorer] tool: mcp__vibium__vibium_find({"placeholder": "Username"})
+[explorer] tool: mcp__vibium__vibium_find({"placeholder": "Password"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "button"})
+[explorer] tool: mcp__vibium__vibium_find({"text": "Login"})
+[explorer] tool: mcp__vibium__vibium_find({"testid": "login-button"})
+[explorer] tool: mcp__vibium__vibium_find({"testid": "user-name"})
+[explorer] tool: mcp__vibium__vibium_find({"testid": "password"})
+[explorer] tool: mcp__vibium__vibium_find({"label": "Username"})
+[explorer] tool: mcp__vibium__vibium_find({"label": "Password"})
+[explorer] tool: mcp__vibium__vibium_screenshot({"output_dir": "D:\\Frameworks\\vibium\\output\\explorer\\login", "name": "login-page"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "heading"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "button", "label": "Login"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "button", "text": "Login"})
+[explorer] tool: mcp__vibium__vibium_find({"label": "Login"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "link"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "img"})
+[explorer] No links or images (Sauce Labs logo likely a background CSS image, not `<img>`). Confirmed 3 interactive elements: username textbox, password textbox, login button.
+[explorer] tool: Write({"file_path": "D:\\Frameworks\\vibium\\output\\explorer\\login\\element-map.json", "content": "{\n  \"page\": \"login\",)
+[explorer] tool: Write({"file_path": "D:\\Frameworks\\vibium\\output\\explorer\\login\\context.md", "content": "# Login page (saucedemo.com)\n\)
+[explorer] Done. 3 interactive elements found, all with confident primary locators, no blocking gaps.
+
+Key findings for the writer agent:
+- `usernameInput`/`passwordInput` → use `placeholder=` (label locator fails despite matching a11y name)
+- `loginButton` → use `role=button,label=Login` (it's `input[type=submit]`; `text=Login` returns 0 matches since it doesn't read the `value` attribute)
+- No links/images/testids resolvable; `data-test` attributes exist in DOM but aren't picked up by the `testid` locator strategy (documented as CSS fallback only)
+
+Files written to `D:\Frameworks\vibium\output\explorer\login\element-map.json` and `context.md`.
+[explorer] done: D:\Frameworks\vibium\output\explorer\login\element-map.json

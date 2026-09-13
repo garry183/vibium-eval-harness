@@ -1,0 +1,38 @@
+[explorer] exploring https://www.saucedemo.com/ -> D:\Frameworks\vibium\output\explorer\login
+[explorer] tool: mcp__vibium__vibium_navigate({"url": "https://www.saucedemo.com/"})
+[explorer] tool: mcp__vibium__vibium_get_a11y_tree({})
+[explorer] tool: mcp__vibium__vibium_find({"role": "textbox", "label": "Username"})
+[explorer] tool: mcp__vibium__vibium_find({"placeholder": "Username"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "textbox", "label": "Password"})
+[explorer] tool: mcp__vibium__vibium_find({"placeholder": "Password"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "button"})
+[explorer] tool: mcp__vibium__vibium_find({"testid": "username"})
+[explorer] tool: mcp__vibium__vibium_find({"testid": "password"})
+[explorer] tool: mcp__vibium__vibium_find({"testid": "login-button"})
+[explorer] tool: mcp__vibium__vibium_find({"testid": "user-name"})
+[explorer] tool: mcp__vibium__vibium_find({"testid": "password"})
+[explorer] tool: mcp__vibium__vibium_find({"testid": "login-button"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "button", "text": "Login"})
+[explorer] tool: mcp__vibium__vibium_find({"text": "Swag Labs"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "heading"})
+[explorer] tool: mcp__vibium__vibium_find({"text": "Login"})
+[explorer] tool: mcp__vibium__vibium_find({"label": "Login"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "heading", "text": "Swag Labs"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "heading", "text": "Accepted usernames are:"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "heading", "text": "Password for all users:"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "img"})
+[explorer] tool: mcp__vibium__vibium_find({"role": "link"})
+[explorer] tool: mcp__vibium__vibium_find({"label": "Username"})
+[explorer] tool: mcp__vibium__vibium_find({"label": "Password"})
+[explorer] tool: mcp__vibium__vibium_screenshot({"output_dir": "D:\\Frameworks\\vibium\\output\\explorer\\login", "name": "login-page"})
+[explorer] tool: Write({"file_path": "D:\\Frameworks\\vibium\\output\\explorer\\login\\element-map.json", "content": "{\n  \"page\": \"login\",)
+[explorer] tool: Write({"file_path": "D:\\Frameworks\\vibium\\output\\explorer\\login\\context.md", "content": "# Login page (saucedemo.com)\n\)
+[explorer] Done. 3 interactive elements mapped, all with confident unambiguous primaries (`placeholder=Username`, `placeholder=Password`, `role=button,label=Login`), 0 blocking gaps.
+
+Notable findings for the writer agent, flagged in context.md:
+- `testid=` strategy is a dead end here — site uses `data-test`, not `data-testid`.
+- `text=Login` fails on the button (it's an `<input value="Login">`, not textContent) — must use `label=`.
+- `label=` fails on the two text inputs — their accessible name comes from `placeholder`, not `aria-label`.
+
+Files written to `D:\Frameworks\vibium\output\explorer\login\element-map.json` and `context.md`.
+[explorer] done: D:\Frameworks\vibium\output\explorer\login\element-map.json
