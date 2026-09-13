@@ -1,0 +1,107 @@
+{
+  "schema": "target-v1",
+  "sample_id": "login",
+  "url": "https://www.saucedemo.com/",
+  "verified_by": "gaurav",
+  "verified_on": "2026-09-08",
+  "locators_probed_against_live_page": "2026-09-08 -- all correct_primary and wrong entries confirmed by direct vibium find_all calls",
+  "note": "Hand-authored from the live DOM. Never derive this from an element-map -- a target built from the system under test cannot detect errors that system makes consistently.",
+  "tiers": {
+    "correct_primary": "semantic, uniquely resolving by design. Allowed as primary.",
+    "acceptable_fallback": "resolves reliably but non-semantic. Allowed only as documented fallback, never primary.",
+    "wrong": "does not resolve, or resolves only by accident of current page state."
+  },
+  "elements": [
+    {
+      "name": "usernameInput",
+      "role": "textbox",
+      "accessible_name": "Username",
+      "accessible_name_source": "placeholder attribute (no <label> element exists)",
+      "html": "<input class=\"input_error form_input\" placeholder=\"Username\" data-test=\"username\" id=\"user-name\" autocorrect=\"off\" autocapitalize=\"none\" type=\"text\" value=\"\" name=\"user-name\">",
+      "correct_primary": ["placeholder=Username"],
+      "acceptable_fallback": [
+        "#user-name",
+        "[data-test=\"username\"]",
+        "[name=\"user-name\"]"
+      ],
+      "wrong": [
+        "label=Username",
+        "role=textbox",
+        ".form_input",
+        ".input_error"
+      ],
+      "wrong_because": {
+        "label=Username": "no associated <label>; vibium's label strategy returns 0",
+        "role=textbox": "count=2 -- vibium matches both inputs (verified 2026-09-08). Ambiguous.",
+        ".form_input": "styling class",
+        ".input_error": "styling class. Note: present in the clean state too despite the name -- it is not an error-state class"
+      },
+      "testability_gap": false
+    },
+    {
+      "name": "passwordInput",
+      "role": "textbox",
+      "accessible_name": "Password",
+      "accessible_name_source": "placeholder attribute (no <label> element exists)",
+      "html": "<input class=\"input_error form_input\" placeholder=\"Password\" data-test=\"password\" id=\"password\" autocorrect=\"off\" autocapitalize=\"none\" type=\"password\" value=\"\" name=\"password\">",
+      "correct_primary": ["placeholder=Password"],
+      "acceptable_fallback": [
+        "#password",
+        "[data-test=\"password\"]",
+        "[name=\"password\"]"
+      ],
+      "wrong": [
+        "label=Password",
+        "role=textbox",
+        ".form_input",
+        ".input_error"
+      ],
+      "wrong_because": {
+        "label=Password": "no associated <label>; vibium's label strategy returns 0",
+        "role=textbox": "count=2 -- vibium matches input[type=password] as textbox, unlike Playwright (verified 2026-09-08). Ambiguous.",
+        ".form_input": "styling class",
+        ".input_error": "styling class. Note: present in the clean state too despite the name -- it is not an error-state class"
+      },
+      "testability_gap": false
+    },
+    {
+      "name": "loginButton",
+      "role": "button",
+      "accessible_name": "Login",
+      "accessible_name_source": "value attribute of <input type=submit>, per HTML-AAM",
+      "html": "<input class=\"submit-button btn_action\" data-test=\"login-button\" id=\"login-button\" type=\"submit\" value=\"Login\" name=\"login-button\">",
+      "correct_primary": [
+        "role=button,label=Login",
+        "label=Login"
+      ],
+      "acceptable_fallback": [
+        "#login-button",
+        "[data-test=\"login-button\"]",
+        "[name=\"login-button\"]"
+      ],
+      "wrong": [
+        "role=button",
+        "text=Login",
+        "role=button,text=Login",
+        "testid=login-button",
+        ".submit-button",
+        ".btn_action"
+      ],
+      "wrong_because": {
+        "role=button": "count=1 only because it is the sole button on this page; the auth-gate error state already shows count=2. Unique by circumstance, not by design.",
+        "text=Login": "count=0 -- 'Login' lives in the value attribute, not a text node",
+        "role=button,text=Login": "count=0, same reason",
+        "testid=login-button": "count=0 -- vibium's testid targets data-testid; this site uses data-test",
+        ".submit-button": "styling class, changes with any redesign",
+        ".btn_action": "styling class, changes with any redesign"
+      },
+      "testability_gap": false,
+      "testability_gap_because": "role=button,label=Login resolves to exactly 1 by design. The unreachable data-test attribute is a vibium limitation, not a page defect."
+    }
+  ],
+  "open_questions": [
+    "This target asserts testability_gap=false for all 3 elements, which disagrees with 4 of the 8 runs. That is the intended outcome of defining the term: a gap means no correct_primary exists.",
+    "RESOLVED 2026-09-08: role=textbox is count=2 in vibium -- it matches input[type=password], unlike Playwright's getByRole. All 8 traces were correct. Note the engines differ, so a locator graded correct here is not automatically correct in the generated Playwright suite.",
+    "RESOLVED 2026-09-08: class=\"input_error\" is present in the clean state (confirmed by screenshot). Misleading name, permanent class, still wrong as a locator."
+  ]
+}

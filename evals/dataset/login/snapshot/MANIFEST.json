@@ -1,0 +1,36 @@
+{
+  "captured_at": "2026-09-08T13:08:40.938805+00:00",
+  "source_url": "https://www.saucedemo.com/",
+  "title": "Swag Labs",
+  "resources": [
+    {
+      "url": "https://www.saucedemo.com/assets/index-Co7SA-g_.css",
+      "file": "assets/index-Co7SA-g_.css",
+      "status": 200,
+      "content_type": "text/css",
+      "bytes": 28192
+    },
+    {
+      "url": "https://www.saucedemo.com/assets/index-XyuNVFOR.js",
+      "file": "assets/index-XyuNVFOR.js",
+      "status": 200,
+      "content_type": "application/javascript",
+      "bytes": 526867
+    },
+    {
+      "url": "https://www.saucedemo.com/",
+      "file": "index.html",
+      "status": 200,
+      "content_type": "text/html",
+      "bytes": 1349
+    }
+  ],
+  "skipped_cross_origin": [
+    "https://events.backtrace.io/api/summed-events/submit?universe=UNIVERSE&token=TOKEN",
+    "https://events.backtrace.io/api/unique-events/submit?universe=UNIVERSE&token=TOKEN",
+    "https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500",
+    "https://fonts.gstatic.com/s/dmmono/v16/aFTR7PB1QTsUX8KYvumzEYOtbQ.woff2",
+    "https://fonts.gstatic.com/s/dmmono/v16/aFTU7PB1QTsUX8KYthqQBA.woff2",
+    "https://fonts.gstatic.com/s/dmsans/v17/rP2Yp2ywxg089UriI5-g4vlH9VoD8Cmcqbu0-K4.woff2"
+  ]
+}
