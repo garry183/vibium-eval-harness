@@ -34,7 +34,7 @@ the page itself, then rebuild the judge properly on whatever survives.
 |---|---|---|
 | 0 — Error analysis | **Closed** 2026-09-11 | `DEFECT-LOG.md` |
 | 1 — Dataset + frozen environment | **Closed** 2026-09-11 | `evals/dataset/`, `tools/snapshot_page.py`, `tools/serve_snapshot.py`, `tools/check_drift.py` |
-| 2 — Deterministic scorers | **in progress** | |
+| 2 — Deterministic scorers | **build done** 2026-09-15, explanation owed | `agents/grader/explore_scorers.py`, `tests/unit/test_explore_scorers.py` |
 | 3 — State-based scorer | not started | |
 | 4 — The harness proper | not started | |
 | Interlude — Dataset expansion | not started, **blocks 5 and 7** | |
@@ -152,6 +152,48 @@ Note for anyone re-running probes by hand: only probe locators expected to
 *match*. A no-match blocks for 30s (`vibium_tools.py:98`, cluster B in
 `DEFECT-LOG.md`), and four of them in one script was enough for the OS to kill
 the process for memory pressure on the first attempt.
+
+---
+
+## What Unit 2 built
+
+Five of the seven judged dimensions are now code. The rubric was converted, not
+deleted — 7 dimensions, 0-5 each, out of 35, bands and the band >= B gate
+unchanged. Only the answerer moved.
+
+| Dimension | Answered by |
+|---|---|
+| `semantic_primary_rate` | code |
+| `coverage_completeness` | code — set membership against Unit 1's `target.json` |
+| `strategy_validation` | code — internal coherence only; live re-resolution is Unit 3 |
+| `dynamic_content_flagging` | code |
+| `multi_strategy_coverage` | code — presence, not format (no `or_chain` spec exists yet) |
+| `context_narrative_quality` | LLM — an opinion about writing |
+| `interaction_contract_quality` | LLM **under protest** — `ElementRecord` has no field for it |
+
+The grader's structured-output schema now accepts only the two judged scores, so
+the LLM cannot answer a question that isn't its to answer. Grading files carry
+`scored_by` and `scorer_notes`, so every number is traceable to its answerer.
+
+**Unit 0 cluster B is now enforced, not just documented.** `count: 0` is never
+read as a measurement — `vibium_tools.py:98` raises on no-match and never
+returns empty, so every zero in every element-map was inferred from an exception.
+`count: null` is treated as an assertion that was never executed.
+
+Scored against the existing login trace: **19/25 from code**, three critical
+failures — all three `data-test` fallbacks carry confidence 3 on a count that was
+never run. `multi_strategy_coverage` 2/5, because two of three `or_chain`s name a
+fallback nobody executed. That trace was band B under the old rubric.
+
+**Owed:** the closed-book explanation (Gaurav), and two explorer fixes this unit
+only detects rather than repairs — make `find_all` return 0 on no-match, and stop
+the explorer writing `count: null`.
+
+### Running it
+
+```bash
+python -m pytest tests/unit/test_explore_scorers.py
+```
 
 ---
 

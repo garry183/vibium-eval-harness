@@ -11,36 +11,28 @@ from pathlib import Path
 
 from claude_agent_sdk import ClaudeAgentOptions, query
 
+from agents.grader.explore_scorers import flatten, score_deterministic
 from agents.grader.grading_tools import EXPLORE_DIMENSIONS, grading_server, take_captured
 from agents.grader.run_log import record_run
 from agents.grader.static_checks import check_writer_files
 from agents.shared.config import EVALS_DIR, MODELS, OUTPUT_DIR, TESTS_DIR, band_for_score
 from agents.shared.schemas import validate_explorer_output
+from evals.dataset.loader import load_sample
 
-EXPLORE_SYSTEM_PROMPT = """You are the explore-grader. You score an \
-explorer agent's output against a fixed rubric so a writer agent downstream \
-can trust it without re-verifying the live page itself.
+EXPLORE_SYSTEM_PROMPT = """You are the explore-grader. You score an explorer agent's output against a fixed rubric so a writer agent downstream can trust it without re-verifying the live page itself.
 
-element-map.json's structural shape has already been validated separately --
-do not re-check schema compliance. Score each of these 7 dimensions 0-5 \
-based on the element-map.json and context.md you're given:
-- semantic_primary_rate: what fraction of elements have a semantic (not css/xpath) primary?
-- coverage_completeness: does the map cover the elements a page like this should have?
-- strategy_validation: are strategy counts/confidence scores plausible given the evidence shown?
-- dynamic_content_flagging: are repeated/dynamic elements (e.g. one-per-card buttons) correctly flagged rather than mis-treated as single ambiguous locators?
-- context_narrative_quality: is context.md a clear, accurate prose summary, not a restatement of the JSON?
-- multi_strategy_coverage: do elements have a fallback strategy (or_chain) when the primary alone might be fragile?
-- interaction_contract_quality: for elements that trigger navigation/state changes, is that noted?
+Most of the rubric has already been answered deterministically and is not yours to score. element-map.json's structural shape, the semantic-primary rate, coverage against the answer key, count/confidence coherence, multi-match flagging and fallback coverage are all computed in code before you are called. Do not re-check any of them, and do not comment on them.
 
-Also flag critical_failures: any element whose PRIMARY strategy is css/xpath, \
-or whose primary strategy has count > 1 (ambiguous).
+Score exactly these 2 dimensions 0-5 from the element-map.json and context.md you're given:
+- context_narrative_quality: is context.md a clear, accurate prose summary that adds something a reader could not get from the JSON -- or is it the JSON restated?
+- interaction_contract_quality: for elements that trigger navigation or a state change, is that consequence recorded anywhere? (The schema has no field for this, which is why it is still judged rather than checked -- read the notes and prose.)
 
-Then check each expectation from the golden case against the evidence and \
-record whether it passed, with a one-line evidence quote.
+Also flag critical_failures, but only judgment-based ones: something wrong that no field check would catch. Locator-type, count and coverage failures are already collected in code -- do not repeat them.
 
-Call submit_explore_grade exactly once, at the end, with your full verdict. \
-Do not call it more than once, and do not explain your reasoning in text \
-afterward -- the tool call is the final answer."""
+Then check each expectation from the golden case against the evidence and record whether it passed, with a one-line evidence quote.
+
+Call submit_explore_grade exactly once, at the end, with your full verdict. Do not call it more than once, and do not explain your reasoning in text afterward -- the tool call is the final answer."""
+
 
 WRITER_SYSTEM_PROMPT = """You are the writer-grader. You score generated \
 test files against a golden list of expectations -- fail fast on evidence \
@@ -77,7 +69,21 @@ async def grade_explore(page: str) -> dict:
     element_map = (out_dir / "element-map.json").read_text()
     context_md = (out_dir / "context.md").read_text()
 
-    schema_errors = validate_explorer_output(json.loads(element_map))
+    parsed = json.loads(element_map)
+    schema_errors = validate_explorer_output(parsed)
+
+    # The answer key from Unit 1. Without it coverage_completeness has nothing
+    # to compare against, so say so loudly rather than scoring a quiet zero.
+    try:
+        target = load_sample(page).target
+        target_errors: list[str] = []
+    except (FileNotFoundError, ValueError) as exc:
+        target, target_errors = None, [
+            f"no usable target for page '{page}' ({exc}) -- coverage_completeness is unscoreable"
+        ]
+
+    code_results = score_deterministic(parsed, target)
+    code_scores, code_criticals, code_notes = flatten(code_results)
 
     prompt = (
         f"Golden case:\n{json.dumps(case, indent=2)}\n\n"
@@ -97,9 +103,10 @@ async def grade_explore(page: str) -> dict:
         pass
 
     verdict = take_captured("explore")
-    score = sum(verdict["dimensions"][d] for d in EXPLORE_DIMENSIONS)
+    dimensions = {**code_scores, **verdict["dimensions"]}
+    score = sum(dimensions[d] for d in EXPLORE_DIMENSIONS)
     band = band_for_score(score)
-    all_critical = [*schema_errors, *verdict["critical_failures"]]
+    all_critical = [*schema_errors, *target_errors, *code_criticals, *verdict["critical_failures"]]
     gate_passed = band in ("A", "B") and not all_critical
 
     result = {
@@ -107,7 +114,9 @@ async def grade_explore(page: str) -> dict:
         "target": page,
         "score": score,
         "band": band,
-        "dimensions": verdict["dimensions"],
+        "dimensions": dimensions,
+        "scored_by": {d: ("code" if d in code_scores else "llm") for d in EXPLORE_DIMENSIONS},
+        "scorer_notes": code_notes,
         "critical_failures": all_critical,
         "results": verdict["expectation_results"],
         "gate_passed": gate_passed,

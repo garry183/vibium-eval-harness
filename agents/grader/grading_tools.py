@@ -12,10 +12,19 @@ from claude_agent_sdk import create_sdk_mcp_server, tool
 
 _captured: dict[str, Any] = {}
 
+from agents.grader.explore_scorers import CODE_DIMENSIONS
+
+# The rubric's seven dimensions, still scored 0-5 each, still out of 35 -- what
+# changed in Unit 2 is who answers them. Five are now computed in
+# agents/grader/explore_scorers.py; the LLM is only asked for the two below.
+# (schema_compliance was removed earlier for the same reason -- a pure
+# structural check enforced by validate_explorer_output. See schemas.py.)
+JUDGED_DIMENSIONS = [
+    "context_narrative_quality",
+    "interaction_contract_quality",
+]
+
 EXPLORE_DIMENSIONS = [
-    # schema_compliance deliberately excluded: it's a pure structural check,
-    # now enforced deterministically by agents.shared.schemas.validate_explorer_output
-    # before the LLM ever sees the output. See schemas.py module docstring.
     "semantic_primary_rate",
     "coverage_completeness",
     "strategy_validation",
@@ -25,13 +34,16 @@ EXPLORE_DIMENSIONS = [
     "interaction_contract_quality",
 ]
 
+assert set(EXPLORE_DIMENSIONS) == set(CODE_DIMENSIONS) | set(JUDGED_DIMENSIONS)
+
 _EXPLORE_SCHEMA = {
     "type": "object",
     "properties": {
         "dimensions": {
             "type": "object",
-            "properties": {d: {"type": "integer", "minimum": 0, "maximum": 5} for d in EXPLORE_DIMENSIONS},
-            "required": EXPLORE_DIMENSIONS,
+            "properties": {d: {"type": "integer", "minimum": 0, "maximum": 5} for d in JUDGED_DIMENSIONS},
+            "required": JUDGED_DIMENSIONS,
+            "additionalProperties": False,
         },
         "critical_failures": {"type": "array", "items": {"type": "string"}},
         "expectation_results": {

@@ -226,21 +226,67 @@ place to find out whether any of it stuck.
 
 ### What I built
 
+`agents/grader/explore_scorers.py` — five code scorers, one per converted
+dimension, plus `tests/unit/test_explore_scorers.py` (28 cases, each dimension
+tested clean *and* dirty). `grading_tools.py` now splits `CODE_DIMENSIONS` from
+`JUDGED_DIMENSIONS`; the grader's structured-output schema accepts only the two
+judged scores and rejects the rest, so the LLM cannot answer a question that is
+no longer its to answer. `grader_agent.py` computes the five, merges them with
+the LLM's two, and records `scored_by` and `scorer_notes` in the grading file so
+any number can be traced to its answerer.
+
+The rubric was **converted, not deleted** — still 7 dimensions, still 0–5 each,
+still out of 35, so `EXPLORE_GRADE_BANDS` and the band ≥ B gate are unchanged.
+Only the answerer moved. Same move as `schema_compliance`, which is the
+precedent this unit generalises.
+
+**Authorship: the scorer code, the tests and the justification table below were
+written by Claude, on request, after Gaurav produced the code/judge sort and had
+it corrected.** Gaurav's own contribution to this unit is the sort itself (3 of
+7 correct on first pass — see the corrections in the table) and the two
+decisions on `count`. Recorded here so it is not mistaken later for his own
+work, same as the Unit 1 snapshot tooling.
+
+Two decisions Gaurav made that shaped the code:
+
+- `count: null` means the explorer asserted a locator it never ran — the
+  explorer should run it or omit it. The scorer treats null as unverified and
+  gates on it when confidence ≥ 3.
+- `count: 0` should be a real value, and the tool must be fixed to return it.
+  Until then, `_unmeasured_reason()` refuses to read a zero as a measurement.
+  Both fixes are owed in `vibium_tools.py:98`; neither was made in this unit.
+
+Result on the existing login trace: **19/25 from code**, with three critical
+failures — all three `data-test` fallbacks carry confidence 3 on a count that
+was never executed. `strategy_validation` 2/5, `multi_strategy_coverage` 2/5
+(two of three `or_chain`s name a fallback that was never run). The old rubric
+scored this trace band B. The deterministic half does not agree.
+
 ### Dimension-by-dimension justification
+
+Test applied: *give two competent engineers the same element-map — could they
+disagree on the answer?* If no, it is code.
 
 | Dimension | Needs an LLM? | Why |
 |---|---|---|
-| semantic_primary_rate | | |
-| coverage_completeness | | |
-| strategy_validation | | |
-| dynamic_content_flagging | | |
-| context_narrative_quality | | |
-| multi_strategy_coverage | | |
-| interaction_contract_quality | | |
+| semantic_primary_rate | **No** | `primary.type` is a literal string from a fixed enum. Counting how many fall in the semantic set is arithmetic. |
+| coverage_completeness | **No** | Was judgment only while nothing existed to compare against. Unit 1's `target.json` made it set membership. Matching is on selectors the answer key recognises, not on element names — the explorer invents those. |
+| strategy_validation | **No** | Internal coherence only: is the primary among the listed strategies, does its count support the claim, is confidence consistent with whether the locator was executed. Live re-resolution against the frozen page is Unit 3's, deliberately not borrowed here. |
+| dynamic_content_flagging | **No** | "Matches more than one and nothing acknowledges it" is two fields and a comparison. |
+| context_narrative_quality | **Yes** | Whether prose adds something the JSON does not is an opinion about writing. No field carries it and no code check approximates it. **Kept.** |
+| multi_strategy_coverage | **No** | Presence of an `or_chain` plus a second strategy with a measured count. Format is deliberately *not* scored: Unit 0 found 47 formats across 20 traces, which is a missing spec, not a model defect — enforcing an unwritten rule is preference wearing a lab coat. |
+| interaction_contract_quality | **Yes, under protest** | Whether an element triggers navigation is a hard fact about the page, but `ElementRecord` has no field for it, so a code scorer has nothing to read. The fix is a schema field, not a better scorer. Logged, not made. **Kept by default, not by merit.** |
+
+**5 of 7 in code.** Exit met. Both survivors are defended above; only one is
+defended on merit.
 
 ### Closed-book explanation
 
 > For each dimension, does it need an LLM, and why?
+
+_Not yet written. Owed by Gaurav, closed-book. Claude authored the build and the
+justification table for this unit, which makes the retention check more
+important here, not less — a table you did not write is not a thing you know._
 
 ---
 
