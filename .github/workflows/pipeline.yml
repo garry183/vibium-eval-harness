@@ -12,6 +12,14 @@ on:
         description: "Page name to run the pipeline for"
         required: true
         default: "login"
+      path:
+        description: "URL path under TARGET_BASE_URL for that page (e.g. /inventory.html)"
+        required: true
+        default: "/"
+
+# Runners have no display -- a headed Vibium browser can't launch there.
+env:
+  VIBIUM_HEADLESS: "true"
 
 jobs:
   explore-and-gate:
@@ -28,7 +36,7 @@ jobs:
       - name: Explore
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: python -m agents.explorer.explorer_agent --page "${{ inputs.page }}"
+        run: python -m agents.explorer.explorer_agent --page "${{ inputs.page }}" --path "${{ inputs.path }}"
       - name: Grade (explore mode) -- gates the writer
         id: grade
         env:

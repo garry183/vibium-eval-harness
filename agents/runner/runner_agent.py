@@ -77,7 +77,21 @@ def _run_pytest(node_ids: list[str]) -> dict:
 
 
 def _failed_tests(report: dict) -> list[dict]:
-    return [t for t in report.get("tests", []) if t.get("outcome") == "failed"]
+    # "error" is a setup/teardown failure (e.g. a fixture's goto timing out) --
+    # just as broken as "failed", only raised outside the test body.
+    return [t for t in report.get("tests", []) if t.get("outcome") in ("failed", "error")]
+
+
+def _collection_errors(report: dict) -> list[dict]:
+    return [c for c in report.get("collectors", []) if c.get("outcome") == "failed"]
+
+
+def _longrepr(test: dict) -> str:
+    for stage in ("setup", "call", "teardown"):
+        text = test.get(stage, {}).get("longrepr")
+        if text:
+            return text
+    return "n/a"
 
 
 def _page_files(page: str) -> dict[str, Path]:
@@ -98,7 +112,7 @@ async def _fix_one(page: str, failure: dict, correction_note: str | None = None)
 
     prompt = (
         f"Failing test: {failure['nodeid']}\n\n"
-        f"Traceback:\n{failure.get('call', {}).get('longrepr', 'n/a')}\n\n"
+        f"Traceback:\n{_longrepr(failure)}\n\n"
         f"element-map.json:\n{element_map}\n\n"
         f"Generated files:\n{file_dump}\n"
     )
@@ -155,7 +169,7 @@ async def _fix_one_guarded(page: str, failure: dict) -> tuple[dict, str | None]:
         changed = scope_guard.changed_properties(before, after)
         allowed = scope_guard.allowed_properties(
             test_name=scope_guard.test_name_from_nodeid(failure["nodeid"]),
-            traceback_text=failure.get("call", {}).get("longrepr", ""),
+            traceback_text=_longrepr(failure),
             page_object_source=after,
             spec_source=spec_path.read_text() if spec_path.exists() else "",
             module_source=module_path.read_text() if module_path.exists() else None,
@@ -200,6 +214,24 @@ async def run_and_fix(page: str) -> bool:
     failures = _failed_tests(report)
 
     log_lines = [f"# Fix log -- {page}", ""]
+
+    # A module that fails to import yields zero test entries, which would
+    # otherwise read as a clean run. The runner can only fix tests, not
+    # collection, so stop here and say so.
+    collection_errors = _collection_errors(report)
+    if collection_errors:
+        log_lines.append("Collection failed -- no tests ran, nothing to classify.")
+        for c in collection_errors:
+            log_lines += ["", f"## {c.get('nodeid')}", "```", c.get("longrepr", "n/a"), "```"]
+        _write_log(page, log_lines)
+        print("[runner] collection failed")
+        return False
+
+    if not failures and report.get("exitcode") != 0:
+        log_lines.append(f"pytest exited {report.get('exitcode')} with no failed tests (e.g. none collected).")
+        _write_log(page, log_lines)
+        print(f"[runner] pytest exit code {report.get('exitcode')}")
+        return False
 
     if not failures:
         log_lines.append("Initial run was clean. No fixes needed.")
@@ -250,7 +282,9 @@ async def run_and_fix(page: str) -> bool:
 
     print("[runner] full re-run after fixes")
     final_report = _run_pytest([spec_node])
-    final_passed = final_report["summary"].get("failed", 0) == 0
+    # Exit code, not the failed count: 0 covers xfail-marked real bugs but
+    # rejects setup errors, collection errors, and an empty run.
+    final_passed = final_report.get("exitcode") == 0
 
     log_lines.append(f"## Final full-suite result: {'GREEN' if final_passed else 'STILL RED'}")
     _write_log(page, log_lines)
