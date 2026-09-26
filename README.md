@@ -37,7 +37,7 @@ side.
 The writer agent is given `Read`/`Write`/`Glob` tools only — no browser
 access, no MCP tools, enforced at the SDK's tool-permission level rather
 than by prompt instruction alone. If the explorer's output is wrong,
-incomplete, or scores below a `B` band on the 8-dimension rubric in
+incomplete, or scores below a `B` band on the 7-dimension rubric in
 `agents/grader`, the writer refuses to run rather than guess. This mirrors
 what actually breaks test suites in practice: not bad test-writing, but
 tests quietly authored against assumptions nobody re-checked against the
@@ -84,12 +84,36 @@ steps, and re-run any single stage without re-running the ones before it.
 Target site: [saucedemo.com](https://www.saucedemo.com) — public, stable,
 no auth/secrets required, so this is runnable by anyone who clones it.
 
+## Observability
+
+Optional. Every Claude Agent SDK call (explorer, grader, writer, runner) can
+be traced to a local [Arize Phoenix](https://github.com/Arize-ai/phoenix) --
+one timeline per agent run with its tool calls, instead of reading
+`stdout.log`. Phoenix is a single local process backed by SQLite: no Docker,
+no database to run.
+
+```bash
+pip install -e .[observability]
+phoenix serve                     # UI at http://localhost:6006, leave running
+```
+
+Then set `PHOENIX_COLLECTOR_ENDPOINT=http://localhost:6006` in `.env` and run
+the pipeline as usual. Traces land in the `vibe-check` project (override with
+`PHOENIX_PROJECT_NAME`). With the variable blank, tracing is off and nothing
+else changes. The SDK's own model calls happen inside the Claude Code
+subprocess, so traces show agent runs and tool calls, not per-request token
+counts.
+
+Licence: Phoenix is Elastic License 2.0 -- free to use, including
+commercially; the one restriction is offering Phoenix itself as a hosted
+service.
+
 ## Repo layout
 
 ```
 agents/
   explorer/   Claude Agent SDK + Vibium tools (navigate, find, click, a11y tree, screenshot)
-  grader/     scores explorer output (8-dim rubric) and writer output (binary pass/fail) against evals/
+  grader/     scores explorer output (7-dim rubric: 5 code, 2 LLM) and writer output (binary pass/fail) against evals/
   writer/     Read/Write/Glob only -- generates pages/, modules/, fixtures/, specs/ from explorer output
   runner/     runs pytest, classifies + fixes failures, re-verifies, writes a fix-log
   shared/     config + the JSON schemas every agent boundary passes through

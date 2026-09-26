@@ -21,6 +21,13 @@ dependencies = [
     "jsonschema>=4.20",
 ]
 
+[project.optional-dependencies]
+observability = [
+    "arize-phoenix",
+    "arize-phoenix-otel",
+    "openinference-instrumentation-claude-agent-sdk",
+]
+
 [tool.pytest.ini_options]
 testpaths = ["tests/unit", "tests/specs"]
 markers = [
