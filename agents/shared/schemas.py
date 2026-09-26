@@ -147,7 +147,7 @@ class ExpectationResult:
 class GradingResult:
     mode: str  # "explore" | "writer"
     target: str  # page name or suite name
-    score: Optional[int] = None  # explore mode: 0-40
+    score: Optional[int] = None  # explore mode: 0-35
     band: Optional[str] = None  # explore mode: A-F
     pass_rate: Optional[float] = None  # writer mode: 0.0-1.0
     results: list[ExpectationResult] = field(default_factory=list)

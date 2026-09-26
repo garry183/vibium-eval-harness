@@ -185,9 +185,11 @@ failures — all three `data-test` fallbacks carry confidence 3 on a count that 
 never run. `multi_strategy_coverage` 2/5, because two of three `or_chain`s name a
 fallback nobody executed. That trace was band B under the old rubric.
 
-**Owed:** the closed-book explanation (Gaurav), and two explorer fixes this unit
-only detects rather than repairs — make `find_all` return 0 on no-match, and stop
-the explorer writing `count: null`.
+**Owed:** the closed-book explanation (Gaurav), and one explorer fix this unit
+only detects rather than repairs — stop the explorer writing `count: null`.
+`find_all` now returns `count: 0` on no-match (timeout caught in
+`vibium_tools.py`); zeros in traces recorded before that change are still
+inferred, not measured.
 
 ### Running it
 

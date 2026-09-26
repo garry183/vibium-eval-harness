@@ -28,6 +28,11 @@ Rules:
 - If a semantic query for an element returns more than 1 match, that \
   locator is ambiguous -- note it and either find a more specific semantic \
   strategy or mark it as a testability_gap.
+- If navigating to the page lands you somewhere else (e.g. a login gate), \
+  reach it with vibium_fill + vibium_click using credentials the page itself \
+  displays, then navigate again. Before mapping anything, confirm the \
+  current url is the page you were asked to explore -- never map a \
+  different page under this page's name.
 - Capture the accessibility tree first, before proposing any strategy --
   it is ground truth, not a strategy source itself.
 - For each interactive element you find: propose 1-2 locator strategies via \
@@ -73,6 +78,7 @@ async def explore_page(page_name: str, path: str) -> None:
         "mcp__vibium__vibium_get_a11y_tree",
         "mcp__vibium__vibium_find",
         "mcp__vibium__vibium_click",
+        "mcp__vibium__vibium_fill",
         "mcp__vibium__vibium_screenshot",
         "Write",
     ]

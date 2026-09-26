@@ -31,11 +31,13 @@ class LoginPage:
 
     @property
     def login_button(self):
-        # No primary locator (testability_gap=True). gap_note recommends the
-        # CSS fallback [data-test='login-button'] as a workaround since
-        # role=button is ambiguity-prone (unlabeled) and text=Login fails to
-        # resolve. Using the documented fallback here per the gap_note.
-        return self.page.locator("[data-test='login-button']")
+        # <input type=submit value="Login"> -- accessible name comes from the
+        # value attribute, so role+name resolves uniquely (evals/dataset/login/
+        # target.json correct_primary). text=Login finds nothing because there
+        # is no text node; that made an earlier crawl wrongly call this a gap.
+        return self.page.get_by_role("button", name="Login").or_(
+            self.page.locator("[data-test='login-button']")
+        )
 
     @property
     def accepted_usernames_heading(self):

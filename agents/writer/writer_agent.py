@@ -30,7 +30,7 @@ Rules (violating any of these is a failed output, not a style nit):
   get_by_text, placeholder -> get_by_placeholder, testid -> get_by_test_id). \
   Never introduce a CSS/XPath locator that isn't already the documented \
   fallback (or_chain) for that element.
-- Write exactly 4 files plus a catalogue, for page name "{page}":
+- Write exactly 5 files (4 layers plus a catalogue), for page name "{page}":
   1. tests/pages/{page}_page.py -- a Page Object class. ONLY locator \
      properties (e.g. `@property def username_input(self): return \
      self.page.get_by_placeholder("Username")`). No actions, no assertions.

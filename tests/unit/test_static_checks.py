@@ -70,6 +70,37 @@ def test_fstring_interpolated_url_is_not_flagged(tmp_path):
     assert failures == []
 
 
+_PAGE_OBJECT = '''
+class LoginPage:
+    def __init__(self, page):
+        self.page = page
+
+    @property
+    def username_input(self):
+        return self.page.get_by_placeholder("Username").or_(self.page.locator("[data-test='username']"))
+
+    @property
+    def login_button(self):
+        return self.page.locator("[data-test='login-button']")
+'''
+
+
+def test_css_only_page_object_property_detected(tmp_path):
+    p = _write(tmp_path, "login_page.py", _PAGE_OBJECT)
+    failures = check_writer_files("login", {"page": [p]})
+    assert len(failures) == 1
+    assert "'login_button'" in failures[0]
+
+
+def test_css_fallback_chained_to_semantic_primary_is_not_flagged(tmp_path):
+    content = _PAGE_OBJECT.replace(
+        "self.page.locator(\"[data-test='login-button']\")",
+        "self.page.get_by_role(\"button\", name=\"Login\").or_(self.page.locator(\"[data-test='login-button']\"))",
+    )
+    p = _write(tmp_path, "login_page.py", content)
+    assert check_writer_files("login", {"page": [p]}) == []
+
+
 def test_missing_layer_reported(tmp_path):
     p = _write(tmp_path, "test_login.py", "def test_x(): assert True\n")
     failures = check_writer_files("login", {"spec": [p], "fixture": []})

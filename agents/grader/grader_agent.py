@@ -15,7 +15,7 @@ from agents.grader.explore_scorers import flatten, score_deterministic
 from agents.grader.grading_tools import EXPLORE_DIMENSIONS, grading_server, take_captured
 from agents.grader.run_log import record_run
 from agents.grader.static_checks import check_writer_files
-from agents.shared.config import EVALS_DIR, MODELS, OUTPUT_DIR, TESTS_DIR, band_for_score
+from agents.shared.config import EVALS_DIR, MODELS, OUTPUT_DIR, TESTS_DIR, band_for_score, band_meets_gate
 from agents.shared.schemas import validate_explorer_output
 from evals.dataset.loader import load_sample
 
@@ -107,7 +107,7 @@ async def grade_explore(page: str) -> dict:
     score = sum(dimensions[d] for d in EXPLORE_DIMENSIONS)
     band = band_for_score(score)
     all_critical = [*schema_errors, *target_errors, *code_criticals, *verdict["critical_failures"]]
-    gate_passed = band in ("A", "B") and not all_critical
+    gate_passed = band_meets_gate(band) and not all_critical
 
     result = {
         "mode": "explore",
@@ -128,10 +128,10 @@ async def grade_explore(page: str) -> dict:
 
 async def grade_writer(suite: str) -> dict:
     case = _load_golden_case("writer-golden.json", suite)
-    page_files = sorted((TESTS_DIR / "pages").glob(f"*{suite}*.py"))
-    module_files = sorted((TESTS_DIR / "modules").glob(f"*{suite}*.py"))
-    fixture_files = sorted((TESTS_DIR / "fixtures").glob(f"*{suite}*.py"))
-    spec_files = sorted((TESTS_DIR / "specs").glob(f"test_{suite}*.py"))
+    page_files = sorted((TESTS_DIR / "pages").glob(f"{suite}_page.py"))
+    module_files = sorted((TESTS_DIR / "modules").glob(f"{suite}_module.py"))
+    fixture_files = sorted((TESTS_DIR / "fixtures").glob(f"{suite}_fixtures.py"))
+    spec_files = sorted((TESTS_DIR / "specs").glob(f"test_{suite}.py"))
     catalogue_files = sorted((TESTS_DIR / "test-cases").glob(f"{suite}.testcases.md"))
     layer_files = {
         "page": page_files, "module": module_files, "fixture": fixture_files,

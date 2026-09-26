@@ -56,6 +56,11 @@ def band_for_score(score: int) -> str:
     return next((b for b, (lo, hi) in EXPLORE_GRADE_BANDS.items() if lo <= score <= hi), "F")
 
 
+def band_meets_gate(band: str) -> bool:
+    order = list(EXPLORE_GRADE_BANDS)
+    return band in order and order.index(band) <= order.index(EXPLORE_GRADE_GATE)
+
+
 def explorer_output_dir(page: str) -> Path:
     d = OUTPUT_DIR / page
     d.mkdir(parents=True, exist_ok=True)
